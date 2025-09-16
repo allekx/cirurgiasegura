@@ -255,12 +255,22 @@ function initFormValidation() {
             const formData = new FormData(this);
             const data = Object.fromEntries(formData);
             
-            // Basic validation
-            if (validateForm(data)) {
-                // Show success message
-                showNotification('Mensagem enviada com sucesso! Entraremos em contato em breve.', 'success');
-                this.reset();
-            }
+            // Basic validation (sem exigir especialidade)
+            const required = ['name', 'email', 'phone'];
+            let valid = true;
+            required.forEach((fieldName) => {
+                const field = this.querySelector(`[name="${fieldName}"]`);
+                if (field && !validateField(field)) {
+                    valid = false;
+                }
+            });
+            if (!valid) return;
+
+            // Formatar e enviar mensagem
+            const message = formatWhatsAppMessage(data);
+            sendToWhatsApp(message);
+            showNotification('Redirecionando para WhatsApp...', 'success');
+            this.reset();
         });
         
         // Real-time validation
@@ -353,16 +363,15 @@ function clearFieldError(field) {
 
 // Validate entire form
 function validateForm(data) {
-    const requiredFields = ['name', 'email', 'phone', 'specialty'];
+    // Compatível, mas sem exigir 'specialty'
+    const requiredFields = ['name', 'email', 'phone'];
     let isValid = true;
-    
     requiredFields.forEach(fieldName => {
         const field = document.querySelector(`[name="${fieldName}"]`);
         if (field && !validateField(field)) {
             isValid = false;
         }
     });
-    
     return isValid;
 }
 

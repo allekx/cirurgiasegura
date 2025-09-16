@@ -24,9 +24,9 @@ const SITE_CONFIG = {
 
     // Redes Sociais
     social: {
-        facebook: "https://facebook.com/cirurgiasegura",
-        instagram: "https://instagram.com/cirurgiasegura",
-        linkedin: "https://linkedin.com/company/cirurgiasegura"
+        facebook: "#",
+        instagram: "https://www.instagram.com/cirurgia_segura_rep.oficial",
+        linkedin: "https://www.linkedin.com/in/nelson-gurgel-aa564a182"
     },
 
     // Configurações do Site
@@ -285,8 +285,8 @@ function configureForm() {
             const formData = new FormData(this);
             const data = Object.fromEntries(formData);
             
-            // Validar campos obrigatórios
-            if (!data.name || !data.email || !data.phone || !data.specialty) {
+            // Validar campos obrigatórios (sem exigir especialidade)
+            if (!data.name || !data.email || !data.phone) {
                 showNotification('Por favor, preencha todos os campos obrigatórios.', 'error');
                 return;
             }
@@ -321,13 +321,15 @@ function formatWhatsAppMessage(data) {
         'nefrologia': 'Nefrologia'
     };
     
-    const specialty = specialtyMap[data.specialty] || data.specialty;
+    const specialty = data.specialty ? (specialtyMap[data.specialty] || data.specialty) : '';
     
     let message = `*NOVA SOLICITAÇÃO - CIRURGIA SEGURA* 🏥\n\n`;
     message += `*Nome:* ${data.name}\n`;
     message += `*E-mail:* ${data.email}\n`;
     message += `*Telefone:* ${data.phone}\n`;
-    message += `*Especialidade:* ${specialty}\n`;
+    if (specialty) {
+        message += `*Especialidade:* ${specialty}\n`;
+    }
     
     if (data.message && data.message.trim()) {
         message += `*Mensagem:* ${data.message}\n`;
@@ -342,7 +344,7 @@ function formatWhatsAppMessage(data) {
 
 // Função para enviar para WhatsApp
 function sendToWhatsApp(message) {
-    const phone = '5592982910122'; // Número do WhatsApp (92) 98291-0122
+    const phone = SITE_CONFIG && SITE_CONFIG.broker && SITE_CONFIG.broker.whatsapp ? SITE_CONFIG.broker.whatsapp : '5592982910122';
     const whatsappUrl = `https://wa.me/${phone}?text=${message}`;
     
     // Abrir WhatsApp em nova aba
